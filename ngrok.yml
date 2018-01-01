@@ -1,0 +1,5 @@
+tunnels:
+  example:
+    proto: http
+    addr: 8080
+    bind_tls: true
