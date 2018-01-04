@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	NGROK_TUNNELS = "http://localhost:4040/api/tunnels"
+	ngrokTunnelsEndPoint = "http://localhost:4040/api/tunnels"
 )
 
 type cliArgs struct {
@@ -56,7 +56,7 @@ type tunnelsResp struct {
 
 func findAllTunnels() []tunnel {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", NGROK_TUNNELS, nil)
+	req, err := http.NewRequest("GET", ngrokTunnelsEndPoint, nil)
 	if err != nil {
 		log.Fatalf("Error when creating request: %v", err)
 	}

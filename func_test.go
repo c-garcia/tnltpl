@@ -8,26 +8,31 @@ import (
 )
 
 const (
-	NGROK_API_EP = "http://localhost:4040"
+	ngrokAPIEndPoint = "http://localhost:4040"
 )
 
 func TestNgrokIsThere(t *testing.T) {
-	resp, err := http.Get(NGROK_API_EP)
+	resp, err := http.Get(ngrokAPIEndPoint)
 	if err != nil {
 		t.Fatalf("ngrok is not there")
 	}
 	defer resp.Body.Close()
 }
 
-func TestGenerateDoc(t *testing.T) {
+func TestRunsTemplate(t *testing.T) {
 
 	givenATemplateFileIncludingTheURLPattern := func() string {
 		return "testdata/test.tpl"
 	}
 
 	whenIExecuteTheToolWithADash := func(f string) (string, error) {
+		inst := exec.Command("go", "install",".")
+		if _, err := inst.CombinedOutput(); err != nil  {
+			t.Errorf("Can't install current package %v", err)
+			return "", err
+		}
 		cmd := exec.Command(
-			"./tnltpl", "-in", "testdata/test.tpl", "-out", "-",
+			"tnltpl", "-in", "testdata/test.tpl", "-out", "-",
 		)
 		var out string
 		var err error
@@ -44,10 +49,9 @@ func TestGenerateDoc(t *testing.T) {
 		if !re.MatchString(o) {
 			t.Errorf("Template does not contain the https ngrok endpoint")
 		}
-
 	}
 
-	andStatusCodeIsZero := func(err error) {
+	andStatusCodeIsNotError := func(err error) {
 		if err != nil {
 			t.Errorf("Exit status expected to be 0 but was %v", err)
 		}
@@ -56,5 +60,5 @@ func TestGenerateDoc(t *testing.T) {
 	tpl := givenATemplateFileIncludingTheURLPattern()
 	out, status := whenIExecuteTheToolWithADash(tpl)
 	thenIGetTheExecutedTemplateOnStdout(out)
-	andStatusCodeIsZero(status)
+	andStatusCodeIsNotError(status)
 }
